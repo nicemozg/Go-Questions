@@ -1,22 +1,34 @@
 package main
 
-import "fmt"
-
-// Функция, которая принимает указатель на int и изменяет значение по этому указателю
-func modifyValue(ptr *int) {
-	*ptr = 10 // изменяем значение по адресу, на который указывает указатель
-}
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
-	x := 5
-	fmt.Println("Исходное значение x:", x) // Вывод: 5
+	// Создаем два канала
+	ch1 := make(chan string)
+	ch2 := make(chan string)
 
-	// Создаем указатель на переменную x
-	ptr := &x
+	// Горутина отправляет "Hello" в канал ch1 через 2 секунды
+	go func() {
+		time.Sleep(2 * time.Second)
+		ch1 <- "Hello"
+	}()
 
-	// Изменяем значение переменной x через указатель
-	modifyValue(ptr)
+	// Горутина отправляет "World" в канал ch2 через 1 секунду
+	go func() {
+		time.Sleep(1 * time.Second)
+		ch2 <- "World"
+	}()
 
-	// Выводим измененное значение переменной x
-	fmt.Println("Измененное значение x:", x) // Вывод: 10
+	// Используем оператор select для ожидания и получения значений из каналов
+	for i := 0; i < 2; i++ {
+		select {
+		case msg1 := <-ch1:
+			fmt.Println("Received from ch1:", msg1)
+		case msg2 := <-ch2:
+			fmt.Println("Received from ch2:", msg2)
+		}
+	}
 }
