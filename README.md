@@ -222,6 +222,7 @@ func main() {
 1. Указатели (pointers):
 
   + Указатели на любой тип (например, *int, *string и т.д.)
+
       ```go
             package main
 
