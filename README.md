@@ -1704,24 +1704,38 @@ ___
 package main
 
 import (
+	"io"
 	"log"
 	"os"
 )
 
 func main() {
-	// Создание файла для логирования
-	file, err := os.Create("app.log")
+	// Открытие файла в режиме добавления или создание нового файла, если он не существует
+	file, err := os.OpenFile("app.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
-		log.Fatal("Cannot create log file:", err)
+		log.Fatal("Cannot open log file:", err)
 	}
 	defer file.Close()
 
-	// Установка логгера для вывода в файл
-	log.SetOutput(file)
+	// Установка многопоточного вывода в файл и в консоль
+	multiWriter := io.MultiWriter(file, os.Stdout)
+	log.SetOutput(multiWriter)
 
 	// Логирование сообщений
-	log.Println("This is a log message")
-	log.Printf("This is a formatted log message with a variable: %d", 42)
+	log.Println("Программа запущена")
+	log.Printf("Значение переменной: %d", 42)
+
+	// Логирование ошибки
+	err = someFunction()
+	if err != nil {
+		log.Printf("Ошибка в someFunction: %v", err)
+	}
+}
+
+// Пример функции, которая может возвращать ошибку
+func someFunction() error {
+	// Имитация ошибки
+	return errors.New("произошла ошибка в someFunction")
 }
 ```
 
